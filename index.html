@@ -212,6 +212,22 @@ const cursosContainer = document.getElementById('cursosContainer');
 let sessionToken = null;
 let cursosDelProfesor = [];
  
+// Normaliza el valor de EsCoordinador: puede llegar como "Si"/"No" directo,
+// o como el objeto/JSON de una columna de Elección de SharePoint sin resolver.
+function esSi(valor){
+  if(!valor) return false;
+  if(valor === 'Si') return true;
+  try{
+    if(typeof valor === 'string' && valor.includes('"Value"')){
+      return JSON.parse(valor)?.Value === 'Si';
+    }
+    if(typeof valor === 'object' && valor.Value){
+      return valor.Value === 'Si';
+    }
+  }catch(e){}
+  return false;
+}
+ 
 loginBtn.addEventListener('click', intentarLogin);
 loginCodigo.addEventListener('keydown', e => { if(e.key === 'Enter') intentarLogin(); });
  
@@ -330,7 +346,7 @@ function renderPostulantes(postulantes, bodyEl){
     bodyEl.innerHTML = '<div class="empty">Aún no hay postulantes para este curso.</div>';
     return;
   }
-  const hayCoordinador = postulantes.some(p => p.esCoordinador === 'Si');
+  const hayCoordinador = postulantes.some(p => esSi(p.esCoordinador));
   bodyEl.innerHTML = postulantes.map(p => {
     const totalOtras = p.totalSeleccionadas || 0;
     const yaSeleccionadoAqui = p.estado === 'Seleccionado';
@@ -339,13 +355,13 @@ function renderPostulantes(postulantes, bodyEl){
     const seleccionadoPorOtro = yaSeleccionadoAqui && !puedeGestionar;
     const alcanzoMax = totalOtras >= CONFIG.MAX_AYUDANTIAS_POR_ALUMNO && !yaSeleccionadoAqui;
     const badgeClass = totalOtras >= CONFIG.MAX_AYUDANTIAS_POR_ALUMNO ? 'warn' : 'ok';
-    const esCoordinador = p.esCoordinador === 'Si';
+    const esCoordinador = esSi(p.esCoordinador);
     // El botón de coordinador solo se deshabilita si YA hay otro coordinador en este curso
     const coordinadorDeshabilitado = (hayCoordinador && !esCoordinador) || seleccionadoPorOtro;
     return `
       <div class="postulante-row" data-item-id="${p.id}" data-rut="${p.rut}">
         <div class="postulante-info">
-          <div class="postulante-nombre">${p.nombre}
+          <div class="postulante-nombre">${p.nombre || '(sin nombre registrado)'}
             <span class="badge ${badgeClass}">${totalOtras}/${CONFIG.MAX_AYUDANTIAS_POR_ALUMNO} ayudantías</span>
             ${esCoordinador ? '<span class="badge ok">★ Coordinador</span>' : ''}
           </div>
@@ -515,7 +531,7 @@ function renderResumen(resumenPorCurso){
         <div style="font-size:13px;font-weight:700;color:var(--navy);">${c.curso}</div>
         ${c.seleccionados.map(p => `
           <div style="font-size:13px;color:var(--text);padding:4px 0 4px 10px;">
-            • ${p.nombre} <span style="color:var(--muted);">(${p.rut})</span>${p.esCoordinador === 'Si' ? ' · <b>Coordinador</b>' : ''}
+            • ${p.nombre} <span style="color:var(--muted);">(${p.rut})</span>${esSi(p.esCoordinador) ? ' · <b>Coordinador</b>' : ''}
           </div>
         `).join('')}
       </div>
@@ -531,7 +547,7 @@ function construirResumenHtml(resumenPorCurso){
     <p style="margin:14px 0 4px;"><b>${c.curso}</b></p>
     <ul style="margin:0;padding-left:18px;">
       ${c.seleccionados.map(p => `
-        <li>${p.nombre} (${p.rut})${p.esCoordinador === 'Si' ? ' — <b>Coordinador</b>' : ''}</li>
+        <li>${p.nombre} (${p.rut})${esSi(p.esCoordinador) ? ' — <b>Coordinador</b>' : ''}</li>
       `).join('')}
     </ul>
   `).join('');
@@ -580,22 +596,3 @@ volverBtn.addEventListener('click', () => {
  
 </body>
 </html>
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
