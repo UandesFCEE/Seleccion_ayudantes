@@ -338,11 +338,14 @@ function renderPostulantes(postulantes, bodyEl){
   bodyEl.innerHTML = postulantes.map(p => {
     const totalOtras = p.totalSeleccionadas || 0;
     const yaSeleccionadoAqui = p.estado === 'Seleccionado';
+    // puedeGestionar viene del flow: false si otro profesor ya lo seleccionó
+    const puedeGestionar = p.puedeGestionar !== false;
+    const seleccionadoPorOtro = yaSeleccionadoAqui && !puedeGestionar;
     const alcanzoMax = totalOtras >= CONFIG.MAX_AYUDANTIAS_POR_ALUMNO && !yaSeleccionadoAqui;
     const badgeClass = totalOtras >= CONFIG.MAX_AYUDANTIAS_POR_ALUMNO ? 'warn' : 'ok';
     const esCoordinador = p.esCoordinador === 'Si';
     // El botón de coordinador solo se deshabilita si YA hay otro coordinador en este curso
-    const coordinadorDeshabilitado = hayCoordinador && !esCoordinador;
+    const coordinadorDeshabilitado = (hayCoordinador && !esCoordinador) || seleccionadoPorOtro;
     return `
       <div class="postulante-row" data-item-id="${p.id}" data-rut="${p.rut}">
         <div class="postulante-info">
@@ -354,8 +357,8 @@ function renderPostulantes(postulantes, bodyEl){
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
           <button class="btn-sel ${yaSeleccionadoAqui ? 'seleccionado' : ''}"
-                  ${alcanzoMax ? 'disabled' : ''}>
-            ${yaSeleccionadoAqui ? '✓ Seleccionado' : (alcanzoMax ? 'Máx. alcanzado' : 'Seleccionar')}
+                  ${(alcanzoMax || seleccionadoPorOtro) ? 'disabled' : ''}>
+            ${seleccionadoPorOtro ? '✓ Seleccionado (otro profesor)' : (yaSeleccionadoAqui ? '✓ Seleccionado' : (alcanzoMax ? 'Máx. alcanzado' : 'Seleccionar'))}
           </button>
           ${yaSeleccionadoAqui ? `
           <button class="btn-sel btn-coordinador ${esCoordinador ? 'seleccionado' : ''}"
@@ -367,10 +370,10 @@ function renderPostulantes(postulantes, bodyEl){
       </div>`;
   }).join('');
  
-  bodyEl.querySelectorAll('.btn-sel:not(.btn-coordinador)').forEach(btn => {
+  bodyEl.querySelectorAll('.btn-sel:not(.btn-coordinador):not(:disabled)').forEach(btn => {
     btn.addEventListener('click', () => onSeleccionar(btn));
   });
-  bodyEl.querySelectorAll('.btn-coordinador').forEach(btn => {
+  bodyEl.querySelectorAll('.btn-coordinador:not(:disabled)').forEach(btn => {
     btn.addEventListener('click', () => onCoordinador(btn));
   });
 }
