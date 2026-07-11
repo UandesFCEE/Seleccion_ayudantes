@@ -158,8 +158,8 @@
  
   <div id="cursosContainer"></div>
  
-  <button class="login-btn" id="terminarBtn" style="margin-top:10px;">Ver resumen y finalizar</button>
-  <div style="text-align:center;margin-top:8px;font-size:11.5px;color:var(--muted);">Cada selección se guarda al instante. Este botón solo te muestra un resumen y te envía la confirmación por correo.</div>
+  <button class="login-btn" id="terminarBtn" style="margin-top:10px;">Enviarme lo seleccionado al correo electrónico</button>
+  <div style="text-align:center;margin-top:8px;font-size:11.5px;color:var(--muted);">Cada clic en "Seleccionar" ya queda guardado — este botón te manda una copia por correo cuando quieras.</div>
  
 </div>
  
@@ -168,7 +168,7 @@
     <h2 style="text-align:center;">Resumen de tu selección</h2>
     <p style="text-align:center;">Estos son los ayudantes que dejaste marcados como "Seleccionado".</p>
     <div id="resumenContenido"></div>
-    <button class="login-btn" id="confirmarSalirBtn" style="margin-top:18px;">Confirmar y salir</button>
+    <button class="login-btn" id="confirmarSalirBtn" style="margin-top:18px;">Cerrar sesión</button>
     <button class="login-btn" id="volverBtn" style="margin-top:10px;background:#fff;color:var(--navy-2);border:1px solid var(--border);">Volver a revisar</button>
   </div>
 </div>
@@ -488,7 +488,7 @@ let resumenActual = [];
  
 terminarBtn.addEventListener('click', async () => {
   terminarBtn.disabled = true;
-  terminarBtn.textContent = 'Cargando resumen…';
+  terminarBtn.textContent = 'Enviando…';
  
   const resumenPorCurso = [];
  
@@ -511,24 +511,49 @@ terminarBtn.addEventListener('click', async () => {
   }
  
   resumenActual = resumenPorCurso;
-  renderResumen(resumenPorCurso);
+ 
+  let envioOk = true;
+  try{
+    const resumenHtml = construirResumenHtml(resumenActual);
+    const res = await fetch(CONFIG.POST_SELECCION_URL, {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'X-Session-Token': sessionToken
+      },
+      body: JSON.stringify({ accion: 'enviar_resumen', resumenHtml })
+    });
+    if(!res.ok){
+      envioOk = false;
+      console.error('Fallo al enviar resumen, status:', res.status, await res.text());
+    }
+  }catch(e){
+    envioOk = false;
+    console.error('Error al enviar resumen:', e);
+  }
+ 
+  renderResumen(resumenPorCurso, envioOk);
  
   terminarBtn.disabled = false;
-  terminarBtn.textContent = 'Ver resumen y finalizar';
+  terminarBtn.textContent = 'Enviarme lo seleccionado al correo electrónico';
  
   appBody.classList.remove('show');
   resumenWrap.style.display = 'block';
 });
  
-function renderResumen(resumenPorCurso){
+function renderResumen(resumenPorCurso, envioOk){
   const totalSeleccionados = resumenPorCurso.reduce((acc, c) => acc + c.seleccionados.length, 0);
  
+  const aviso = envioOk
+    ? '<p style="text-align:center;color:var(--ok);font-size:13px;font-weight:600;">✓ Enviado a tu correo</p>'
+    : '<p style="text-align:center;color:var(--red);font-size:13px;font-weight:600;">No se pudo enviar el correo. Puedes seguir trabajando e intentar de nuevo.</p>';
+ 
   if(totalSeleccionados === 0){
-    resumenContenido.innerHTML = '<p style="text-align:center;color:var(--muted);">Todavía no has seleccionado a ningún postulante.</p>';
+    resumenContenido.innerHTML = aviso + '<p style="text-align:center;color:var(--muted);">Todavía no has seleccionado a ningún postulante.</p>';
     return;
   }
  
-  resumenContenido.innerHTML = resumenPorCurso
+  resumenContenido.innerHTML = aviso + resumenPorCurso
     .filter(c => c.seleccionados.length > 0)
     .map(c => `
       <div style="margin-top:14px;">
@@ -557,28 +582,7 @@ function construirResumenHtml(resumenPorCurso){
   `).join('');
 }
  
-confirmarSalirBtn.addEventListener('click', async () => {
-  confirmarSalirBtn.disabled = true;
-  confirmarSalirBtn.textContent = 'Enviando confirmación…';
- 
-  try{
-    const resumenHtml = construirResumenHtml(resumenActual);
-    const res = await fetch(CONFIG.POST_SELECCION_URL, {
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'X-Session-Token': sessionToken
-      },
-      body: JSON.stringify({ accion: 'enviar_resumen', resumenHtml })
-    });
-    if(!res.ok){
-      console.error('Fallo al enviar resumen, status:', res.status, await res.text());
-    }
-  }catch(e){
-    console.error('Error al enviar resumen:', e);
-    // si el correo falla, igual dejamos salir al profesor sin bloquear el flujo
-  }
- 
+confirmarSalirBtn.addEventListener('click', () => {
   sessionToken = null;
   cursosDelProfesor = [];
   resumenActual = [];
@@ -588,8 +592,6 @@ confirmarSalirBtn.addEventListener('click', async () => {
   loginCodigo.value = '';
   profesorInfo.style.display = 'none';
   cursosContainer.innerHTML = '';
-  confirmarSalirBtn.disabled = false;
-  confirmarSalirBtn.textContent = 'Confirmar y salir';
 });
  
 volverBtn.addEventListener('click', () => {
@@ -600,44 +602,3 @@ volverBtn.addEventListener('click', () => {
  
 </body>
 </html>
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
