@@ -576,7 +576,13 @@ function construirResumenHtml(resumenPorCurso){
     <p style="margin:14px 0 4px;"><b>${c.curso}</b></p>
     <ul style="margin:0;padding-left:18px;">
       ${c.seleccionados.map(p => `
-        <li>${p.nombre} (${p.rut})${esSi(p.esCoordinador) ? ' — <b>Coordinador</b>' : ''}</li>
+        <li style="margin-bottom:8px;">
+          ${p.nombre} (${p.rut})${esSi(p.esCoordinador) ? ' — <b>Coordinador</b>' : ''}<br>
+          <span style="font-size:12px;color:#6B7684;">
+            ${p.carrera || p.condicion || '—'} · ${p.celular || '—'} · ${p.correo || '—'}<br>
+            PGA: ${p.pga || '—'} · Nota asignatura: ${p.nota || '—'}
+          </span>
+        </li>
       `).join('')}
     </ul>
   `).join('');
@@ -602,3 +608,4 @@ volverBtn.addEventListener('click', () => {
  
 </body>
 </html>
+ 
