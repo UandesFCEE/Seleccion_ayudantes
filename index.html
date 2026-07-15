@@ -229,6 +229,13 @@ function esSi(valor){
   return false;
 }
  
+// Formatea el PGA con 2 decimales; si no es un número válido, muestra "—"
+function formatPGA(valor){
+  const n = parseFloat(valor);
+  if(isNaN(n)) return '—';
+  return n.toFixed(2);
+}
+ 
 loginBtn.addEventListener('click', intentarLogin);
 loginCodigo.addEventListener('keydown', e => { if(e.key === 'Enter') intentarLogin(); });
  
@@ -336,13 +343,14 @@ async function cargarPostulantes(curso, bodyEl){
     if(!res.ok) throw new Error('sin respuesta');
     const data = await res.json();
     const postulantes = data.postulantes || [];
-    renderPostulantes(postulantes, bodyEl);
+    const permiteCoordinador = data.permiteCoordinador !== false; // por defecto true si no viene el dato
+    renderPostulantes(postulantes, bodyEl, permiteCoordinador);
   }catch(e){
     bodyEl.innerHTML = '<div class="empty">No se pudo cargar el listado. Intenta nuevamente.</div>';
   }
 }
  
-function renderPostulantes(postulantes, bodyEl){
+function renderPostulantes(postulantes, bodyEl, permiteCoordinador){
   if(!postulantes.length){
     bodyEl.innerHTML = '<div class="empty">Aún no hay postulantes para este curso.</div>';
     return;
@@ -366,9 +374,10 @@ function renderPostulantes(postulantes, bodyEl){
             <span class="badge ${badgeClass}">${totalOtras}/${CONFIG.MAX_AYUDANTIAS_POR_ALUMNO} ayudantías</span>
             ${esCoordinador ? '<span class="badge ok">★ Coordinador</span>' : ''}
           </div>
-          <div class="postulante-detalle">${p.rut} · ${p.carrera || p.condicion}${p.celular ? ' · ' + p.celular : ''}</div>
+          <div class="postulante-detalle">${p.carrera || p.condicion}</div>
           <div class="postulante-detalle" style="margin-top:3px;">
-            PGA: ${p.pga || '—'} &nbsp;·&nbsp; Nota asignatura: ${p.nota || '—'}
+            PGA: ${formatPGA(p.pga)}<br>
+            Nota asignatura: ${p.nota || '—'}
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
@@ -376,7 +385,7 @@ function renderPostulantes(postulantes, bodyEl){
                   ${(alcanzoMax || seleccionadoPorOtro) ? 'disabled' : ''}>
             ${seleccionadoPorOtro ? '✓ Seleccionado (otro profesor)' : (yaSeleccionadoAqui ? '✓ Seleccionado' : (alcanzoMax ? 'Máx. alcanzado' : 'Seleccionar'))}
           </button>
-          ${yaSeleccionadoAqui ? `
+          ${(yaSeleccionadoAqui && permiteCoordinador) ? `
           <button class="btn-sel btn-coordinador ${esCoordinador ? 'seleccionado' : ''}"
                   ${coordinadorDeshabilitado ? 'disabled' : ''}
                   style="font-size:11px;padding:5px 10px;">
@@ -580,7 +589,7 @@ function construirResumenHtml(resumenPorCurso){
           ${p.nombre} (${p.rut})${esSi(p.esCoordinador) ? ' — <b>Coordinador</b>' : ''}<br>
           <span style="font-size:12px;color:#6B7684;">
             ${p.carrera || p.condicion || '—'} · ${p.celular || '—'} · ${p.correo || '—'}<br>
-            PGA: ${p.pga || '—'} · Nota asignatura: ${p.nota || '—'}
+            PGA: ${formatPGA(p.pga)} · Nota asignatura: ${p.nota || '—'}
           </span>
         </li>
       `).join('')}
