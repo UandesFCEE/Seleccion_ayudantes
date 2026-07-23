@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -41,26 +40,104 @@
   }
   header h1{margin:0;font-size:19px;font-weight:700;line-height:1.3;color:var(--navy);}
   header p{margin:6px 0 0;font-size:13px;color:var(--muted);}
-
-.wrap{max-width:720px;margin:0 auto;padding:20px 16px 60px;}
-
-.selector-card{background(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px;}label{display;font-size:12.5px;font-weight:600;color(--navy-2);margin-bottom:6px;}select, input{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:7px;font-size:14.5px;color(--text);background:#fff;font-family;}select, input{outline;border-color(--navy-2);box-shadow:0 0 0 3px rgba(36,55,70,0.12);}
-
-.aviso{background:#FFF6E5;border:1px solid #F0D48A;color:#7A5B00;font-size:12.5px;padding:10px 14px;border-radius:8px;margin-bottom:16px;}
-
-.curso-card{background(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;overflow;}.curso-header{padding:15px 18px;display;justify-content;align-items;cursor;background:#FAFBFC;}.curso-header h3{margin:0;font-size:15px;color(--navy);}.curso-header .meta{font-size:11.5px;color(--muted);margin-top:2px;}.curso-header .chevron{color(--muted);transition .15s;font-size:13px;}.curso-header.open .chevron{transform(180deg);}.curso-body{display;border-top:1px solid var(--border);}.curso-body.open{display;}
-
-.postulante-row{padding:13px 18px;border-bottom:1px solid var(--border);display;align-items;gap:12px;}.postulante-row{border-bottom;}.postulante-info{flex:1;min-width:0;}.postulante-nombre{font-size:14px;font-weight:600;color(--navy);}.postulante-detalle{font-size:12px;color(--muted);margin-top:2px;}.badge{display;font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:20px;margin-left:6px;}.badge.ok{background:#E4F4EC;color(--ok);}.badge.warn{background:#FCE9EA;color(--red);}
-
-.btn-sel{flex-shrink:0;padding:8px 14px;border-radius:7px;border:1px solid var(--border);background:#fff;color(--navy-2);font-size:12.5px;font-weight:600;cursor;white-space;transition .15s;}.btn-sel:hover(){border-color(--navy-2);}.btn-sel.seleccionado{background(--ok);border-color(--ok);color:#fff;}.btn-sel{opacity:.45;cursor;}
-
-.empty, .loading{text-align;color(--muted);font-size:13px;padding:30px 20px;}.config-note{font-size:11.5px;color(--muted);text-align;margin-top:18px;}
-
-/* Login */.login-wrap{max-width:400px;margin:60px auto 0;padding:0 16px;}.login-card{background(--card);border:1px solid var(--border);border-radius:10px;padding:28px 24px;text-align;}.login-card h2{margin:0 0 6px;font-size:17px;color(--navy);}.login-card p{margin:0 0 20px;font-size:13px;color(--muted);}.login-card label{text-align;}.login-error{font-size:12.5px;color(--red);margin-top:10px;display;}.login-error.show{display;}.login-btn{width:100%;margin-top:16px;padding:13px;background(--red);color:#fff;border;border-radius:8px;font-size:14.5px;font-weight:600;cursor;}.login-btn#appBody{display;}#appBody.show{display;}</style>
-
+ 
+  .wrap{max-width:720px;margin:0 auto;padding:20px 16px 60px;}
+ 
+  .selector-card{
+    background:var(--card);border:1px solid var(--border);border-radius:10px;
+    padding:20px;margin-bottom:16px;
+  }
+  label{display:block;font-size:12.5px;font-weight:600;color:var(--navy-2);margin-bottom:6px;}
+  select, input{
+    width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:7px;
+    font-size:14.5px;color:var(--text);background:#fff;font-family:inherit;
+  }
+  select:focus, input:focus{outline:none;border-color:var(--navy-2);box-shadow:0 0 0 3px rgba(36,55,70,0.12);}
+ 
+  .aviso{
+    background:#FFF6E5;border:1px solid #F0D48A;color:#7A5B00;
+    font-size:12.5px;padding:10px 14px;border-radius:8px;margin-bottom:16px;
+  }
+ 
+  .curso-card{
+    background:var(--card);border:1px solid var(--border);border-radius:10px;
+    margin-bottom:14px;overflow:hidden;
+  }
+  .curso-header{
+    padding:15px 18px;display:flex;justify-content:space-between;align-items:center;
+    cursor:pointer;background:#FAFBFC;
+  }
+  .curso-header h3{margin:0;font-size:15px;color:var(--navy);}
+  .curso-header .meta{font-size:11.5px;color:var(--muted);margin-top:2px;}
+  .curso-header .chevron{color:var(--muted);transition:transform .15s;font-size:13px;}
+  .curso-header.open .chevron{transform:rotate(180deg);}
+  .curso-body{display:none;border-top:1px solid var(--border);}
+  .curso-body.open{display:block;}
+ 
+  .postulante-row{
+    padding:13px 18px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:12px;
+  }
+  .postulante-row:last-child{border-bottom:none;}
+  .postulante-info{flex:1;min-width:0;}
+  .postulante-nombre{font-size:14px;font-weight:600;color:var(--navy);}
+  .postulante-detalle{font-size:12px;color:var(--muted);margin-top:2px;}
+  .badge{
+    display:inline-block;font-size:10.5px;font-weight:600;
+    padding:2px 7px;border-radius:20px;margin-left:6px;
+  }
+  .badge.ok{background:#E4F4EC;color:var(--ok);}
+  .badge.warn{background:#FCE9EA;color:var(--red);}
+ 
+  .btn-sel{
+    flex-shrink:0;padding:8px 14px;border-radius:7px;border:1px solid var(--border);
+    background:#fff;color:var(--navy-2);font-size:12.5px;font-weight:600;cursor:pointer;
+    white-space:nowrap;transition:all .15s;
+  }
+  .btn-sel:hover:not(:disabled){border-color:var(--navy-2);}
+  .btn-sel.seleccionado{background:var(--ok);border-color:var(--ok);color:#fff;}
+  .btn-sel:disabled{opacity:.45;cursor:not-allowed;}
+ 
+  .empty, .loading{
+    text-align:center;color:var(--muted);font-size:13px;padding:30px 20px;
+  }
+  .config-note{font-size:11.5px;color:var(--muted);text-align:center;margin-top:18px;}
+ 
+  /* Login */
+  .login-wrap{max-width:400px;margin:60px auto 0;padding:0 16px;}
+  .login-card{
+    background:var(--card);border:1px solid var(--border);border-radius:10px;
+    padding:28px 24px;text-align:center;
+  }
+  .login-card h2{margin:0 0 6px;font-size:17px;color:var(--navy);}
+  .login-card p{margin:0 0 20px;font-size:13px;color:var(--muted);}
+  .login-card label{text-align:left;}
+  .login-error{
+    font-size:12.5px;color:var(--red);margin-top:10px;display:none;
+  }
+  .login-error.show{display:block;}
+  .login-btn{
+    width:100%;margin-top:16px;padding:13px;background:var(--red);color:#fff;
+    border:none;border-radius:8px;font-size:14.5px;font-weight:600;cursor:pointer;
+  }
+  .login-btn:hover{background:#A80014;}
+  #appBody{display:none;}
+  #appBody.show{display:block;}
+</style>
+<style>
+  #avisoServicio{
+    background:#FFF6E5;border-bottom:1px solid #F0D48A;color:#7A5B00;
+    font-size:12.5px;text-align:center;padding:10px 16px;
+  }
+</style>
 </head>
 <body>
-
+ 
+<!-- Para activar/desactivar este aviso, cambia AVISO_SERVICIO_ACTIVO más abajo en el <script> -->
+<div id="avisoServicio" style="display:none;">
+  Estamos experimentando una interrupción temporal de los servicios de Microsoft que puede afectar el ingreso al portal. Si tienes problemas, intenta nuevamente en unos minutos.
+</div>
+ 
 <header>
   <img id="logoImg" alt="Facultad de Ciencias Económicas y Empresariales">
   <div class="header-text">
@@ -69,7 +146,7 @@
     <p>Facultad de Ciencias Económicas y Empresariales</p>
   </div>
 </header>
-
+ 
 <div class="login-wrap" id="loginWrap">
   <div class="login-card">
     <h2>Acceso profesores</h2>
@@ -82,22 +159,21 @@
     <button class="login-btn" id="loginBtn">Ingresar</button>
   </div>
 </div>
-
+ 
 <div class="wrap" id="appBody">
-
+ 
   <div class="selector-card" id="profesorInfo" style="display:none;">
     <label>Profesor</label>
     <div style="font-size:15px;font-weight:600;color:var(--navy);" id="profesorNombre"></div>
   </div>
-
+ 
   <div id="cursosContainer"></div>
-
-<button class="login-btn" id="terminarBtn" style="margin-top:10px;">Enviarme lo seleccionado al correo electrónico</button>
-
+ 
+  <button class="login-btn" id="terminarBtn" style="margin-top:10px;">Enviarme lo seleccionado al correo electrónico</button>
   <div style="text-align:center;margin-top:8px;font-size:11.5px;color:var(--muted);">Cada clic en "Seleccionar" ya queda guardado — este botón te manda una copia por correo cuando quieras.</div>
-
+ 
 </div>
-
+ 
 <div class="login-wrap" id="resumenWrap" style="display:none;">
   <div class="login-card" style="text-align:left;">
     <h2 style="text-align:center;">Resumen de tu selección</h2>
@@ -107,12 +183,20 @@
     <button class="login-btn" id="volverBtn" style="margin-top:10px;background:#fff;color:var(--navy-2);border:1px solid var(--border);">Volver a revisar</button>
   </div>
 </div>
-
+ 
+ 
 <script>
 /* ============================================================
    CONFIGURACIÓN — reemplazar con las URLs reales de los flows
    de Power Automate.
    ============================================================ */
+// Cambia a true para mostrar el aviso de interrupción de servicios de Microsoft.
+// Cambia a false (o bórralo) cuando el problema esté resuelto.
+const AVISO_SERVICIO_ACTIVO = true;
+if(AVISO_SERVICIO_ACTIVO){
+  document.getElementById('avisoServicio').style.display = 'block';
+}
+ 
 const CONFIG = {
   // Flow HTTP trigger: recibe { correo, codigo }, valida contra la lista SharePoint
   // "Codigos Profesores" (NUNCA se expone al navegador) y devuelve un token de sesión
@@ -548,6 +632,6 @@ volverBtn.addEventListener('click', () => {
   appBody.classList.add('show');
 });
 </script>
-
+ 
 </body>
 </html>
